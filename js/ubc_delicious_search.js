@@ -7,6 +7,8 @@ jQuery(document).ready(function() {
 	var feed_url = 'http://feeds.delicious.com/v2/json/'+default_user; //left it here so that if search is destroyed, we can still use filters
 	var search_base_url = 'https://avosapi.delicious.com/api/v1/posts/public/';
 	var search_url = search_base_url+default_user+'/time?limit='+default_limit+'&has_all=true&tagsor='+default_useor;
+	var pagination_index = 1;
+	var default_pagination = encodeURIComponent(jQuery('.ubc_delicious_results.resource_listings').data('pagination'));
 	
 	//if reset exists, then reset form
 	if (reset_button.length > 0) {
@@ -35,6 +37,7 @@ jQuery(document).ready(function() {
 					this.checked = false;
 				}
 			});
+			pagination_index = 1;	//resets pagination if reset button pressed
 			
 			//re-query again.  Since we are in reset, if it exists, then submit MUST exist
 			jQuery('#ubc-delicious-submit').click();
@@ -92,6 +95,7 @@ jQuery(document).ready(function() {
   	//also take into consideration clicking on enter key
   	jQuery('#ubc-delicious-search-term').keyup(function(e) {
   		if (e.keyCode == 13) {
+			pagination_index = 1;	//resets pagination if reset button pressed		
   			jQuery('#ubc-delicious-submit').click();
   		}
   	});
@@ -103,6 +107,8 @@ jQuery(document).ready(function() {
   	 * @return void - if results return, fill in result area with list.
   	 */
   	jQuery('.ubc-delicious-dropdown').change(function(e) {
+		pagination_index = 1;	//resets pagination if reset button pressed	
+
   		if (jQuery('#ubc-delicious-submit').length) {
   			jQuery('#ubc-delicious-submit').click();
   		} else {
@@ -118,6 +124,8 @@ jQuery(document).ready(function() {
 	 * @return void
 	 */
 	 jQuery('.ubc-delicious-checkbox').change(function(e) {
+ 		pagination_index = 1;	//resets pagination if reset button pressed			
+	 
   		if (jQuery('#ubc-delicious-submit').length) {
   			jQuery('#ubc-delicious-submit').click();
   		} else {
@@ -125,6 +133,21 @@ jQuery(document).ready(function() {
   			submit_delicious_query(search_url+'&tags='+ (tags.length > 0 ? '&tags='+tags : ''));
 		}
   	});
+  	
+  	/**
+  	* pagination detection!
+  	*/
+  	jQuery('.ubc_delicious_results').on('click', '.ubc-delicious-pagination a', function(e) {
+  		pagination_index = jQuery(this).attr('href').replace(/\D/g,'');
+  		if (jQuery('#ubc-delicious-submit').length) {
+  			jQuery('#ubc-delicious-submit').click();
+  		} else {
+  			var tags = get_all_current_tags(true);
+  			submit_delicious_query(search_url+'&tags='+ (tags.length > 0 ? '&tags='+tags : ''));
+		}
+		e.preventDefault();
+	});
+
 
 
 	/**
@@ -180,6 +203,28 @@ jQuery(document).ready(function() {
         					});
         					break;
 					}
+					
+					//need some logic to handle pagination
+					var i, pagination_html;
+					var temp = [];
+
+					if (typeof write_area.data('pagination') !== 'undefined' && parseInt(write_area.data('pagination')) > 0) {
+						
+						for (i = 0; i < new_pkg.length; i = i + parseInt(default_pagination)) {
+							i = parseInt(i);
+							temp.push(new_pkg.slice(i, i+parseInt(default_pagination)));
+						}
+						
+						if (temp.length > 1) {	//only show pagination IF # returned > pagination
+							pagination_html = '<div class="ubc-delicious-pagination pagination pagination-centered"><ul class="page-numbers">';
+
+							for (i = 1; i <= temp.length; i++) {
+								pagination_html += '<li'+((pagination_index == i)? ' class="active"' : '')+'><a href="#p-'+i+'">'+i+'</a></li>'
+							} 
+							pagination_html += '</ul></div>';
+						}
+						new_pkg = temp[pagination_index-1];	//zero based array with 1 based pagination...
+					}
 
 	        		//create links
 	        		switch (view_type) {
@@ -216,6 +261,11 @@ jQuery(document).ready(function() {
 	        				break;
 					}				
 		        }
+		        
+		        if (typeof write_area.data('pagination') !== 'undefined' && parseInt(write_area.data('pagination')) > 0 && pagination_html) {
+		        	return_string += pagination_html;
+	        	}
+	        	
 		        write_area.append(return_string);
 	        }
 	    });
