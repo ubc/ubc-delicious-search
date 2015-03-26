@@ -1,54 +1,14 @@
 # _Project_
 
-_Description: What does this project do and who does it serve?_
+This wordpress plugin enables users to integrate their delicious links into the wordpress website, with filtering and searching.
 
-## Project Setup
-
-_How do I, as a developer, start working on the project?_ 
-
-1. _What dependencies does it have (where are they expressed) and how do I install them?_
-2. _How can I see the project working before I change anything?_
-
-## Testing
-
-_How do I run the project's automated tests?_
-
-### Unit Tests
-
-1. `rake spec`
-
-### Integration Tests
-
-1. _Run other local services / provide credentials for external services._
-2. `rake spec:integration`
-
-## Deploying
-
-### _How to setup the deployment environment_
-
-- _Required heroku addons, packages, or chef recipes._
-- _Required environment variables or credentials not included in git._
-- _Monitoring services and logging._
-
-### _How to deploy_
+_Notes:_
+- to use this plugin effectively, you'll need to be very organized and determine ahead of time what tags you are going to use for each filter.
+- e.g. if you want to filter by "type" and "color" where: 
+  * type => { 'video', 'pdf', 'doc', 'website', 'etc' } 
+  * color => { 'red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet' }
+  * Then for every link you mark with delicious, you should tag it with one type and one color
 
 ## Troubleshooting & Useful Tools
 
-_Examples of common tasks_
-
-> e.g.
-> 
-> - How to make curl requests while authenticated via oauth.
-> - How to monitor background jobs.
-> - How to run the app through a proxy.
-
-## Contributing changes
-
-- _Internal git workflow_
-- _Pull request guidelines_
-- _Tracker project_
-- _Google group_
-- _irc channel_
-- _"Please open github issues"_
-
-## License
+Please see the [readme.txt](https://github.com/ubc/ubc-delicious-search/blob/master/readme.txt) to see how it is used
